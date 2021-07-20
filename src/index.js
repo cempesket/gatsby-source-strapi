@@ -1,5 +1,6 @@
 import pluralize from 'pluralize';
 import _, { upperFirst, camelCase, capitalize } from 'lodash';
+import fetchAndMergeLocales from './single-type-localizations';
 
 import fetchData from './fetch';
 import { Node } from './nodes';
@@ -81,7 +82,12 @@ exports.sourceNodes = async (
   fetchActivity.start();
 
   const collectionTypes = (options.collectionTypes || []).map(contentTypeToTypeInfo);
-  const singleTypes = (options.singleTypes || []).map(singleTypeToTypeInfo);
+
+  const singleTypeOptions = options.singleTypes || [];
+
+  const otherLocales = await fetchAndMergeLocales(ctx, singleTypeOptions);
+
+  const singleTypes = [...singleTypeOptions, ...otherLocales].map(singleTypeToTypeInfo);
 
   const types = [...collectionTypes, ...singleTypes];
 
